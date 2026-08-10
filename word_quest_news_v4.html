@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Word Quest - 나만의 영어 단어 게임</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#18212f; --muted:#6f7a8a;
+    --accent:#6c63ff; --accent2:#9b8cff; --good:#16a36a; --bad:#e25555;
+    --line:#e8eaf0; --shadow:0 14px 40px rgba(38,47,77,.10);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    background:
+      radial-gradient(circle at 10% 0%, #ece9ff 0, transparent 32%),
+      radial-gradient(circle at 100% 15%, #e2f3ff 0, transparent 26%),
+      var(--bg);
+    color:var(--ink); min-height:100vh;
+  }
+  .wrap{max-width:720px;margin:auto;padding:18px 16px 40px}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .brand{font-weight:900;font-size:22px;letter-spacing:-.5px}
+  .pill{background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-weight:800}
+  .hero{
+    background:linear-gradient(135deg,#6c63ff,#887bff 55%,#6dbdf5);
+    color:#fff;border-radius:28px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden
+  }
+  .hero:after{content:"✦";position:absolute;right:22px;top:8px;font-size:72px;opacity:.18}
+  .hero h1{font-size:28px;margin:0 0 7px}.hero p{margin:0;opacity:.9;line-height:1.5}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center;box-shadow:0 5px 18px rgba(38,47,77,.05)}
+  .stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-top:14px}
+  .section-title{font-size:18px;font-weight:900;margin-bottom:12px}
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  button{font:inherit}
+  .mode,.primary,.ghost,.answer{
+    border:0;border-radius:16px;cursor:pointer;transition:.15s transform,.15s filter
+  }
+  .mode:active,.primary:active,.ghost:active,.answer:active{transform:scale(.98)}
+  .mode{padding:17px;text-align:left;background:#f4f3ff;color:var(--ink);font-weight:850}
+  .mode small{display:block;color:var(--muted);margin-top:4px;font-weight:600}
+  .primary{width:100%;padding:16px;background:var(--accent);color:white;font-weight:900;margin-top:12px}
+  .ghost{padding:10px 12px;background:#f1f3f7;color:var(--ink);font-weight:800}
+  .quiz{display:none}
+  .qtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .progress{height:9px;background:#eceef5;border-radius:99px;overflow:hidden;margin:14px 0 22px}
+  .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#69c0ff);transition:.3s}
+  .badge{display:inline-block;background:#f0efff;color:#574ed7;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}
+  .word{font-size:38px;font-weight:950;letter-spacing:-1px;margin:14px 0 6px}
+  .hint{color:var(--muted);margin-bottom:16px}
+  .answers{display:grid;gap:10px}
+  .answer{padding:15px 16px;background:#f7f8fb;border:1px solid #eceef3;text-align:left;font-weight:800;color:var(--ink)}
+  .answer.good{background:#e9fbf3;border-color:#bfead7;color:#0f7d52}
+  .answer.bad{background:#fff0f0;border-color:#f2c1c1;color:#b94444}
+  .feedback{min-height:26px;margin:14px 2px 0;font-weight:850}
+  .list{display:grid;gap:8px;max-height:340px;overflow:auto}
+  .row{display:grid;grid-template-columns:1fr 1.2fr;gap:10px;padding:11px 12px;border-radius:14px;background:#f8f9fb}
+  .row b{font-size:15px}.row span{color:#5f6b7b;font-size:14px}
+  .add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  input{width:100%;padding:13px;border:1px solid #dfe3ea;border-radius:14px;font:inherit;outline:none}
+  input:focus{border-color:#8d84ff;box-shadow:0 0 0 3px #eceaff}
+  .tiny{font-size:12px;color:var(--muted);line-height:1.45;margin-top:8px}
+  .hidden{display:none!important}
+  @media(max-width:500px){
+    .word{font-size:33px}.modes{grid-template-columns:1fr}.hero h1{font-size:25px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">✨ Word Quest</div>
+    <div class="pill">Lv. <span id="level">1</span></div>
+  </div>
+
+  <section id="home">
+    <div class="hero">
+      <h1>오늘도 단어 사냥!</h1>
+      <p>검색했던 영어 단어를 퀴즈로 반복해서 익혀보세요.<br>연속 정답을 맞히면 콤보 점수가 올라갑니다.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="score">0</b><span>점수</span></div>
+      <div class="stat"><b id="best">0</b><span>최고 콤보</span></div>
+      <div class="stat"><b id="count">0</b><span>단어 수</span></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">게임 모드</div>
+      <div class="modes">
+        <button class="mode" onclick="startQuiz('en-ko')">🇺🇸 영어 → 뜻<small>영어 단어의 뜻 고르기</small></button>
+        <button class="mode" onclick="startQuiz('ko-en')">🇰🇷 뜻 → 영어<small>뜻에 맞는 영어 단어 고르기</small></button>
+        <button class="mode" onclick="startQuiz('mixed')">⚡ 랜덤 챌린지<small>두 방식이 섞여서 출제</small></button>
+        <button class="mode" onclick="startQuiz('hard')">🔥 하드 모드<small>비슷한 뜻이 섞여 나와요</small></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">내 단어장 <span style="font-size:12px;color:#6c63ff">· 뉴스기사 단어 포함</span></div>
+      <div style="font-size:13px;color:#6f7a8a;margin-bottom:8px">기본 + 신문기사 단어 <b id="visibleCount">48개</b></div><div class="list" id="wordList"></div>
+      <div class="add">
+        <input id="newEn" placeholder="영어 단어">
+        <input id="newKo" placeholder="뜻">
+      </div>
+      <button class="primary" onclick="addWord()">+ 단어 추가</button>
+      <div class="tiny">추가한 단어와 점수는 이 기기의 브라우저에 저장됩니다.</div>
+    </div>
+  </section>
+
+  <section id="quiz" class="quiz">
+    <div class="card">
+      <div class="qtop">
+        <button class="ghost" onclick="goHome()">← 나가기</button>
+        <div class="pill">❤️ <span id="hearts">3</span> · 🔥 <span id="combo">0</span></div>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <span class="badge" id="modeBadge">QUIZ</span>
+      <div class="word" id="question"></div>
+      <div class="hint" id="hint"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const seedWords = [
+  {en:"equity", ko:"공정성, 형평성 / 지분"},
+  {en:"aisle", ko:"통로"},
+  {en:"stormwater", ko:"빗물, 우수"},
+  {en:"sewer", ko:"하수도, 하수관"},
+  {en:"mitigation", ko:"완화, 경감"},
+  {en:"reignited", ko:"다시 불붙은, 재점화된"},
+  {en:"contingency", ko:"만일의 사태, 비상 상황"},
+  {en:"posture", ko:"자세 / 태도 / 군사 태세"},
+  {en:"allies", ko:"동맹국들, 우방국들"},
+  {en:"kick off", ko:"시작하다, 개시하다"},
+  {en:"joint", ko:"공동의, 합동의"},
+  {en:"exercise", ko:"훈련, 군사 연습 / 운동"},
+
+  {en:"strengthen", ko:"강화하다, 강하게 하다"},
+  {en:"potential", ko:"잠재적인, 가능성이 있는 / 잠재력"},
+  {en:"incorporate", ko:"포함하다, 도입하다, 통합하다"},
+  {en:"multidomain", ko:"다영역의, 여러 작전 영역에 걸친"},
+  {en:"defense posture", ko:"방위 태세"},
+  {en:"realism", ko:"현실감, 사실성"},
+  {en:"combat readiness", ko:"전투 준비 태세"},
+  {en:"battalion", ko:"대대(군 부대 단위)"},
+  {en:"field training exercise", ko:"야외 기동 훈련, 야외 훈련"},
+  {en:"command post exercise", ko:"지휘소 연습"},
+  {en:"coordinate", ko:"조정하다, 협력하다"},
+  {en:"establish", ko:"설립하다, 수립하다, 확립하다"},
+  {en:"national emergency", ko:"국가 비상사태"},
+  {en:"public safety", ko:"공공 안전"},
+  {en:"response", ko:"대응, 반응"},
+  {en:"wartime", ko:"전시, 전쟁 시기"},
+  {en:"conditions-based", ko:"조건에 기반한"},
+  {en:"transition", ko:"전환, 이행"},
+  {en:"operational control", ko:"작전통제권"},
+  {en:"transfer", ko:"이양, 이전 / 이양하다"},
+  {en:"verification", ko:"검증, 확인"},
+  {en:"full-scale", ko:"전면적인, 본격적인"},
+  {en:"assessment", ko:"평가"},
+  {en:"assess", ko:"평가하다, 판단하다"},
+  {en:"capability", ko:"능력, 역량"},
+  {en:"respective", ko:"각자의, 각각의"},
+  {en:"commander", ko:"지휘관, 사령관"},
+  {en:"combined forces", ko:"연합군, 연합 전력"},
+  {en:"military drill", ko:"군사 훈련"},
+  {en:"conduct an exercise", ko:"훈련을 실시하다"},
+  {en:"annual exercise", ko:"연례 훈련"},
+  {en:"defensive in nature", ko:"본질적으로 방어적인"},
+  {en:"scenario", ko:"상황 설정, 시나리오"},
+  {en:"conflict", ko:"분쟁, 충돌"},
+  {en:"civilian", ko:"민간인, 민간의"},
+  {en:"official", ko:"관계자, 관리 / 공식적인"}
+]
+
+function safeGet(key, fallback){
+  try{
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v;
+  }catch(e){
+    return fallback;
+  }
+}
+function safeSet(key, value){
+  try{ localStorage.setItem(key, value); }catch(e){}
+}
+
+let storedWords = [];
+try{
+  storedWords = JSON.parse(safeGet("wq_words", "[]")) || [];
+}catch(e){
+  storedWords = [];
+}
+
+let words = [...storedWords];
+for (const sw of seedWords) {
+  const exists = words.some(w => (w.en || "").toLowerCase() === sw.en.toLowerCase());
+  if (!exists) words.push(sw);
+}
+safeSet("wq_words", JSON.stringify(words));
+
+let score = Number(safeGet("wq_score", "0")) || 0;
+let best = Number(safeGet("wq_best", "0")) || 0;
+let mode="mixed", qIndex=0, total=10, hearts=3, combo=0, locked=false, current=null;
+
+function save(){
+  safeSet("wq_words", JSON.stringify(words));
+  safeSet("wq_score", String(score));
+  safeSet("wq_best", String(best));
+}
+function renderHome(){
+  document.getElementById("score").textContent=score;
+  document.getElementById("best").textContent=best;
+  document.getElementById("count").textContent=words.length; const vc=document.getElementById("visibleCount"); if(vc) vc.textContent=words.length+"개";
+  document.getElementById("level").textContent=Math.floor(score/250)+1;
+  document.getElementById("wordList").innerHTML=words.map((w,i)=>
+    `<div class="row"><b>${escapeHtml(w.en)}</b><span>${escapeHtml(w.ko)}</span></div>`).join("");
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function addWord(){
+  const en=document.getElementById("newEn").value.trim();
+  const ko=document.getElementById("newKo").value.trim();
+  if(!en||!ko){alert("영어 단어와 뜻을 모두 입력해주세요.");return}
+  words.push({en,ko}); save(); renderHome();
+  document.getElementById("newEn").value=""; document.getElementById("newKo").value="";
+}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function startQuiz(m){
+  if(words.length<4){alert("퀴즈를 하려면 단어가 4개 이상 필요해요.");return}
+  mode=m; qIndex=0; hearts=3; combo=0;
+  document.getElementById("home").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  nextQuestion();
+}
+function nextQuestion(){
+  locked=false;
+  if(qIndex>=total || hearts<=0){finish();return}
+  current=words[Math.floor(Math.random()*words.length)];
+  let actualMode = mode==="mixed"||mode==="hard" ? (Math.random()<.5?"en-ko":"ko-en") : mode;
+  const question = actualMode==="en-ko" ? current.en : current.ko;
+  const correct = actualMode==="en-ko" ? current.ko : current.en;
+  const pool=shuffle(words.filter(w=>w!==current)).slice(0,3).map(w=>actualMode==="en-ko"?w.ko:w.en);
+  const opts=shuffle([correct,...pool]);
+  document.getElementById("question").textContent=question;
+  document.getElementById("hint").textContent=actualMode==="en-ko" ? "가장 알맞은 뜻을 고르세요." : "뜻에 맞는 영어 표현을 고르세요.";
+  document.getElementById("modeBadge").textContent=mode==="hard"?"HARD MODE":actualMode==="en-ko"?"EN → KO":"KO → EN";
+  document.getElementById("answers").innerHTML=opts.map(o=>`<button class="answer" onclick='answer(this, ${JSON.stringify(o)}, ${JSON.stringify(correct)})'>${escapeHtml(o)}</button>`).join("");
+  document.getElementById("feedback").textContent="";
+  updateHud();
+}
+function answer(btn, chosen, correct){
+  if(locked)return; locked=true;
+  const all=[...document.querySelectorAll(".answer")];
+  if(chosen===correct){
+    btn.classList.add("good"); combo++; score += 10 + Math.min(combo*2,20);
+    if(combo>best)best=combo;
+    document.getElementById("feedback").textContent = combo>=3 ? `정답! 🔥 ${combo} 콤보!` : "정답! ✨";
+  }else{
+    btn.classList.add("bad"); hearts--; combo=0;
+    all.find(x=>x.textContent===correct)?.classList.add("good");
+    document.getElementById("feedback").textContent = `아쉬워요! 정답은 “${correct}”`;
+  }
+  save(); updateHud(); qIndex++;
+  setTimeout(nextQuestion, 1100);
+}
+function updateHud(){
+  document.getElementById("hearts").textContent=hearts;
+  document.getElementById("combo").textContent=combo;
+  document.getElementById("bar").style.width=`${Math.min(qIndex/total*100,100)}%`;
+}
+function finish(){
+  const message = hearts<=0 ? "하트를 모두 사용했어요!" : "10문제 완료!";
+  document.getElementById("question").textContent=message;
+  document.getElementById("hint").textContent=`현재 점수 ${score}점 · 최고 콤보 ${best}`;
+  document.getElementById("answers").innerHTML=`<button class="primary" onclick="startQuiz(mode)">한 판 더 🎮</button><button class="ghost" style="width:100%;margin-top:8px;padding:14px" onclick="goHome()">단어장으로</button>`;
+  document.getElementById("feedback").textContent="";
+  document.getElementById("bar").style.width="100%";
+}
+function goHome(){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("home").style.display="block";
+  renderHome();
+}
+renderHome();
+</script>
+</body>
+</html>
