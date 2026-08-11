@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Word Quest 뉴스영어</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--ink:#172033;--muted:#778196;--pri:#665cf6;--pri2:#8d86ff;--line:#e7e9f1;--good:#159a63;--bad:#de5656}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#f8f8ff,#f4f6fb);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;color:var(--ink)}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 42px}.hero{background:linear-gradient(135deg,#655cf5,#7d74ff 55%,#67b8ef);color:white;border-radius:26px;padding:23px;box-shadow:0 15px 35px rgba(61,68,120,.13)}
+.hero h1{margin:0 0 6px;font-size:27px}.hero p{margin:0;line-height:1.5;opacity:.93}.warning{display:none;margin:12px 0;padding:13px 15px;border-radius:15px;background:#fff5db;border:1px solid #f2d98c;color:#755a11;font-weight:750;line-height:1.45}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0}.stat{background:white;border:1px solid var(--line);border-radius:17px;padding:13px;text-align:center}.stat b{font-size:20px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.card{background:white;border:1px solid var(--line);border-radius:24px;padding:19px;margin-top:13px;box-shadow:0 10px 28px rgba(48,57,91,.07)}.title{font-size:19px;font-weight:900;margin-bottom:12px}
+.deck-grid{display:grid;gap:9px}.deck{padding:15px;border:1px solid var(--line);background:#fafaff;border-radius:16px;text-align:left}.deck strong{font-size:16px}.deck small{display:block;color:var(--muted);margin-top:4px}
+.deck.active{border:2px solid var(--pri);background:#f2f0ff}.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mode{padding:16px;border:0;border-radius:16px;background:#f2f0ff;text-align:left;font-weight:850;color:var(--ink)}.mode small{display:block;color:var(--muted);margin-top:3px}
+button{font:inherit;cursor:pointer}.primary{width:100%;border:0;border-radius:16px;background:var(--pri);color:white;font-weight:900;padding:15px;margin-top:11px}.ghost{border:0;border-radius:13px;background:#f0f2f6;padding:10px 12px;font-weight:800;color:var(--ink)}
+.quiz{display:none}.qtop{display:flex;justify-content:space-between;align-items:center}.progress{height:9px;border-radius:20px;background:#eceef5;overflow:hidden;margin:14px 0 20px}.bar{height:100%;background:linear-gradient(90deg,var(--pri),#69c0ff);width:0}
+.badge{display:inline-block;padding:6px 9px;border-radius:999px;background:#efedff;color:#564cd6;font-size:12px;font-weight:900}.word{font-size:36px;font-weight:950;margin:14px 0 5px}.hint{color:var(--muted);margin-bottom:15px}.answers{display:grid;gap:9px}
+.answer{border:1px solid #e7e9ef;border-radius:15px;background:#f8f9fb;padding:14px 15px;text-align:left;font-weight:800;color:var(--ink)}.answer.good{background:#e9faf2;border-color:#b9e5d0;color:#0f7b50}.answer.bad{background:#fff0f0;border-color:#f2c1c1;color:#ae4040}
+.feedback{min-height:25px;margin-top:12px;font-weight:850}.row{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;padding:10px 11px;border-radius:13px;background:#f8f9fb;margin:7px 0}.row span{color:#5e6878;font-size:14px}.add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+input{width:100%;padding:12px;border:1px solid #dfe3eb;border-radius:13px;font:inherit}.tiny{font-size:12px;color:var(--muted);line-height:1.45;margin-top:8px}
+select{width:100%;padding:12px;border:1px solid #dfe3eb;border-radius:13px;background:white;font:inherit}
+@media(max-width:520px){.modes{grid-template-columns:1fr}.word{font-size:31px}.hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section id="home">
+  <div class="hero"><h1>✨ Word Quest 뉴스영어</h1><p>신문에서 찾은 단어를 날짜별로 모으고, 원하는 단어장만 골라 복습해요.</p></div>
+  <div id="fileWarning" class="warning">⚠️ 지금은 아이폰의 파일 미리보기라 버튼이 작동하지 않을 수 있어요. 이 파일을 GitHub Pages에 올려 <b>https:// 주소</b>로 열면 정상 작동합니다.</div>
+
+  <div class="stats">
+    <div class="stat"><b id="score">0</b><span>점수</span></div>
+    <div class="stat"><b id="best">0</b><span>최고 콤보</span></div>
+    <div class="stat"><b id="count">0</b><span>선택 단어 수</span></div>
+  </div>
+
+  <div class="card">
+    <div class="title">📅 날짜별 단어장</div>
+    <div id="deckGrid" class="deck-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="title">🎮 퀴즈 시작</div>
+    <div class="modes">
+      <button class="mode" data-mode="en-ko">🇺🇸 영어 → 뜻<small>영어 단어의 뜻 고르기</small></button>
+      <button class="mode" data-mode="ko-en">🇰🇷 뜻 → 영어<small>뜻에 맞는 영어 고르기</small></button>
+      <button class="mode" data-mode="mixed">⚡ 랜덤 챌린지<small>두 방식이 섞여서 출제</small></button>
+      <button class="mode" data-mode="hard">🔥 하드 모드<small>오답 선택지가 더 까다로움</small></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">➕ 내 단어 추가</div>
+    <select id="addDeck"></select>
+    <div class="add"><input id="newEn" placeholder="영어 단어"><input id="newKo" placeholder="뜻"></div>
+    <button id="addBtn" class="primary">+ 선택한 날짜 단어장에 추가</button>
+    <div class="tiny">GitHub Pages처럼 https://로 열면 추가 단어와 점수가 이 기기에 저장됩니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="title">📖 선택한 단어장 보기</div>
+    <div id="wordList"></div>
+  </div>
+</section>
+
+<section id="quiz" class="quiz">
+  <div class="card">
+    <div class="qtop"><button id="exitBtn" class="ghost">← 나가기</button><b>❤️ <span id="hearts">3</span> · 🔥 <span id="combo">0</span></b></div>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <span id="modeBadge" class="badge">QUIZ</span>
+    <div id="question" class="word"></div>
+    <div id="hint" class="hint"></div>
+    <div id="answers" class="answers"></div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const builtinDecks = [
+ {id:"2026-08-11", title:"2026. 8. 11. 신문기사", subtitle:"주요기사 · 세계면 · 경제 · 국제 · 칼럼 중심 100단어", words:[["contingency", "만일의 사태, 비상 상황"],["posture", "태세, 입장"],["strengthen", "강화하다"],["incorporate", "포함하다, 통합하다"],["multidomain", "다영역의"],["combat readiness", "전투 준비 태세"],["battalion", "대대"],["field training exercise", "야외 기동 훈련"],["command post exercise", "지휘소 연습"],["coordinate", "조정하다, 협력하다"],["wartime", "전시"],["transition", "전환, 이행"],["operational control", "작전통제권"],["verification", "검증, 확인"],["full-scale", "전면적인, 본격적인"],["assessment", "평가"],["capability", "능력, 역량"],["respective", "각자의, 각각의"],["combined forces", "연합군, 연합 전력"],["defensive in nature", "본질적으로 방어적인"],["conversion", "환전, 전환"],["rebound", "반등하다, 반등"],["onshore market", "국내 금융시장"],["exchange rate", "환율"],["foreign investor", "외국인 투자자"],["depositary receipt", "주식예탁증서"],["intervention", "개입"],["appreciation", "통화 가치 상승"],["outlook", "전망"],["inclusion", "편입, 포함"],["sovereign bond", "국채"],["volatility", "변동성"],["fluctuate", "등락하다, 변동하다"],["financial crisis", "금융 위기"],["tariff", "관세"],["sell-off", "대규모 매도"],["currency", "통화"],["offshore market", "역외 시장"],["liquidity", "유동성"],["foreign exchange", "외환"],["ceasefire", "휴전"],["far-right", "극우의"],["military backer", "군사적 후원자"],["hostage", "인질"],["enclave", "고립 영토, 특정 세력의 거점"],["stabilization force", "안정화 부대"],["disarm", "무장 해제하다"],["obstruct", "방해하다"],["veto", "거부권을 행사하다 / 거부권"],["targeted attack", "표적 공격"],["withdrawal", "철수"],["rejection", "거부, 반대"],["reservation", "유보, 의구심"],["mediator", "중재자"],["guarantor", "보증국, 보증인"],["road map", "단계적 계획, 로드맵"],["disband", "해산시키다"],["demilitarize", "비무장화하다"],["militant", "무장세력원 / 전투적인"],["stabilization", "안정화"],["vulnerable", "취약한"],["missile", "미사일"],["drone", "무인기, 드론"],["deterrence", "억지력"],["deployment", "배치"],["strategic asset", "전략 자산"],["strike capability", "타격 능력"],["air defense", "방공"],["surveillance", "감시"],["reconnaissance", "정찰"],["fortify", "요새화하다, 강화하다"],["countermeasure", "대응책"],["immigration crackdown", "이민 단속 강화"],["beleaguered", "곤경에 처한, 포위된"],["resistance", "저항"],["federal", "연방의"],["primary", "예비선거"],["incumbent", "현직자"],["constituency", "선거구, 유권자층"],["polarization", "양극화"],["approval rating", "지지율"],["plummet", "급락하다"],["margin", "격차, 차이"],["reiterate", "거듭 강조하다"],["scrutiny", "면밀한 검토, 감시"],["backlash", "반발"],["pledge", "약속하다 / 공약"],["bipartisan", "초당적인"],["revenue", "수익"],["earnings call", "실적 발표 전화회의"],["generate revenue", "수익을 창출하다"],["infrastructure", "기반시설"],["case study", "사례 연구"],["institution", "기관"],["collaboration", "협업"],["established", "저명한, 확립된"],["amid", "~가운데, ~속에서"],["underscore", "강조하다"],["loom over", "먹구름처럼 드리우다, 위협하다"],["ripple through", "파급되다"]]},
+ {id:"previous", title:"이전에 검색한 단어", subtitle:"기존 뉴스·학습 단어", words:[
+  ["equity","공정성, 형평성 / 지분"],["aisle","통로"],["stormwater","빗물, 우수"],["sewer","하수도, 하수관"],
+  ["mitigation","완화, 경감"],["reignited","다시 불붙은, 재점화된"]
+ ]}
+];
+
+function safeGet(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+let custom={}; try{custom=JSON.parse(safeGet("wq_custom_decks","{}"))||{}}catch(e){custom={}}
+let decks=builtinDecks.map(d=>({id:d.id,title:d.title,subtitle:d.subtitle,words:d.words.map(x=>({en:x[0],ko:x[1]}))}));
+Object.keys(custom).forEach(id=>{
+  const d=decks.find(x=>x.id===id);
+  if(d) custom[id].forEach(w=>{if(!d.words.some(x=>x.en.toLowerCase()===w.en.toLowerCase()))d.words.push(w)});
+});
+let selectedId=safeGet("wq_selected_deck","2026-08-11");
+if(!decks.some(d=>d.id===selectedId)) selectedId="2026-08-11";
+let score=Number(safeGet("wq_score","0"))||0, best=Number(safeGet("wq_best","0"))||0;
+let quizWords=[],mode="mixed",qIndex=0,total=10,hearts=3,combo=0,locked=false,current=null;
+
+const $=id=>document.getElementById(id);
+
+function selectedDeck(){return decks.find(d=>d.id===selectedId)||decks[0]}
+function render(){
+  $("score").textContent=score;$("best").textContent=best;$("count").textContent=selectedDeck().words.length;
+  $("deckGrid").innerHTML=decks.map(d=>`<button class="deck ${d.id===selectedId?"active":""}" data-deck="${esc(d.id)}"><strong>📘 ${esc(d.title)}</strong><small>${esc(d.subtitle)} · ${d.words.length}개</small></button>`).join("");
+  $("addDeck").innerHTML=decks.map(d=>`<option value="${esc(d.id)}" ${d.id===selectedId?"selected":""}>${esc(d.title)}</option>`).join("");
+  $("wordList").innerHTML=selectedDeck().words.map(w=>`<div class="row"><b>${esc(w.en)}</b><span>${esc(w.ko)}</span></div>`).join("");
+  document.querySelectorAll("[data-deck]").forEach(btn=>btn.addEventListener("click",()=>{selectedId=btn.dataset.deck;safeSet("wq_selected_deck",selectedId);render()}));
+}
+function saveCustom(){safeSet("wq_custom_decks",JSON.stringify(custom))}
+function addWord(){
+  const en=$("newEn").value.trim(),ko=$("newKo").value.trim(),id=$("addDeck").value;
+  if(!en||!ko){alert("영어 단어와 뜻을 모두 입력해주세요.");return}
+  if(!custom[id])custom[id]=[];
+  if(!custom[id].some(w=>w.en.toLowerCase()===en.toLowerCase()))custom[id].push({en,ko});
+  const d=decks.find(x=>x.id===id); if(d&&!d.words.some(w=>w.en.toLowerCase()===en.toLowerCase()))d.words.push({en,ko});
+  saveCustom();$("newEn").value="";$("newKo").value="";selectedId=id;render();
+}
+function startQuiz(m){
+  quizWords=selectedDeck().words;
+  if(quizWords.length<4){alert("이 단어장에는 퀴즈를 만들 단어가 4개 이상 필요합니다.");return}
+  mode=m;qIndex=0;hearts=3;combo=0;$("home").style.display="none";$("quiz").style.display="block";nextQuestion();
+}
+function nextQuestion(){
+  locked=false;if(qIndex>=total||hearts<=0){finish();return}
+  current=quizWords[Math.floor(Math.random()*quizWords.length)];
+  const actual=(mode==="mixed"||mode==="hard")?(Math.random()<.5?"en-ko":"ko-en"):mode;
+  const q=actual==="en-ko"?current.en:current.ko, correct=actual==="en-ko"?current.ko:current.en;
+  const others=shuffle(quizWords.filter(w=>w!==current)).slice(0,3).map(w=>actual==="en-ko"?w.ko:w.en);
+  const opts=shuffle([correct,...others]);
+  $("question").textContent=q;$("hint").textContent=actual==="en-ko"?"가장 알맞은 뜻을 고르세요.":"뜻에 맞는 영어 표현을 고르세요.";
+  $("modeBadge").textContent=mode==="hard"?"HARD MODE":actual==="en-ko"?"EN → KO":"KO → EN";
+  $("answers").innerHTML=opts.map((o,i)=>`<button class="answer" data-i="${i}">${esc(o)}</button>`).join("");
+  $("feedback").textContent="";$("bar").style.width=Math.min(qIndex/total*100,100)+"%";$("hearts").textContent=hearts;$("combo").textContent=combo;
+  [...$("answers").children].forEach((btn,i)=>btn.addEventListener("click",()=>answer(btn,opts[i],correct)));
+}
+function answer(btn,chosen,correct){
+  if(locked)return;locked=true;
+  if(chosen===correct){btn.classList.add("good");combo++;score+=10+Math.min(combo*2,20);best=Math.max(best,combo);$("feedback").textContent=combo>=3?`정답! 🔥 ${combo} 콤보!`:"정답! ✨"}
+  else{btn.classList.add("bad");hearts--;combo=0;[...$("answers").children].forEach(x=>{if(x.textContent===correct)x.classList.add("good")});$("feedback").textContent=`아쉬워요! 정답은 “${correct}”`}
+  safeSet("wq_score",String(score));safeSet("wq_best",String(best));$("hearts").textContent=hearts;$("combo").textContent=combo;qIndex++;setTimeout(nextQuestion,950)
+}
+function finish(){
+  $("question").textContent=hearts<=0?"하트를 모두 사용했어요!":"10문제 완료!";
+  $("hint").textContent=`${selectedDeck().title} · 현재 점수 ${score}점 · 최고 콤보 ${best}`;
+  $("answers").innerHTML='<button id="againBtn" class="primary">한 판 더 🎮</button><button id="homeBtn" class="ghost" style="width:100%;margin-top:8px;padding:14px">단어장으로</button>';
+  $("feedback").textContent="";$("bar").style.width="100%";
+  $("againBtn").addEventListener("click",()=>startQuiz(mode));$("homeBtn").addEventListener("click",goHome)
+}
+function goHome(){$("quiz").style.display="none";$("home").style.display="block";render()}
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>startQuiz(b.dataset.mode)));
+$("addBtn").addEventListener("click",addWord);$("exitBtn").addEventListener("click",goHome);
+if(location.protocol==="file:"||location.protocol==="about:")$("fileWarning").style.display="block";
+render();
+})();
+</script>
+</body>
+</html>
