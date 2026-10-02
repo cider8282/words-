@@ -34,7 +34,7 @@ body{background:#eaf0dd}.brand:after{content:'3D';display:inline-block;margin-le
 #flies .fly{pointer-events:auto}
 #flies .fly .bug{visibility:visible!important;display:block!important;opacity:1;position:relative;overflow:hidden;background:none}
 #flies .fly .bug>img{visibility:visible!important;display:block!important;opacity:1;position:absolute;width:200%;height:200%;max-width:none}
-.live-speed{display:flex;align-items:center;gap:7px;font-size:11px;white-space:nowrap}.live-speed select{width:auto;max-width:170px;margin:0;padding:8px;font-size:12px}</style></head><body><div class="wrap"><header class="top"><div class="brand">🪰 BUZZ HUNTERS<span>단어 파리잡기 · ACTION 6</span></div><div class="row"><span id="level" class="pill">Lv. 1</span><button class="btn sound" id="sound">🔊 소리 ON</button></div></header>
+.live-speed{display:flex;align-items:center;gap:7px;font-size:11px;white-space:nowrap}.live-speed select{width:auto;max-width:170px;margin:0;padding:8px;font-size:12px}</style></head><body><div class="wrap"><header class="top"><div class="brand">🪰 BUZZ HUNTERS<span>단어 파리잡기 · ACTION 7</span></div><div class="row"><span id="level" class="pill">Lv. 1</span><button class="btn sound" id="sound">🔊 소리 ON</button></div></header>
 <section id="home"><div class="hero" id="hero"><div><div class="eyebrow"><span id="heroStage">BREAKFAST OOPS!</span></div><h1>잡았다!<br>이 장난꾸러기<br><em>파리들!</em></h1><p>박사·기자·엄마·아기, 네 파리의 대소동!<br>정답을 찾아 파리채로 퐁! 잡아보세요.</p><button class="primary" id="heroStart">🖐 파리 사냥 시작</button></div></div>
 <section class="stage-section"><div class="sectionline"><h2>CHOOSE YOUR HUNT</h2><span>스테이지마다 다른 움직임과 제한 시간</span></div><div id="stageCards" class="stage-cards"></div></section><div class="stats"><div class="stat"><b id="xp">0</b><span>누적 경험치</span></div><div class="stat"><b id="coins">0</b><span>모은 별</span></div><div class="stat"><b id="deckCount">0</b><span>내 단어장</span></div><div class="stat"><b id="best">0</b><span>최고 콤보</span></div></div><div class="layout"><div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">📚 사냥할 단어장을 골라요</h2><button class="btn" id="newDeck">+ 새 단어장</button></div><div class="tabs" style="margin-top:17px"><button class="btn active" id="activeTab">학습 중</button><button class="btn" id="archiveTab">보관함</button></div><div class="decklist" id="decks"></div><div class="notice" id="notice" role="status"></div><details><summary>목록 파일 불러오기 · 전체 기록 백업</summary><p class="muted">단어장 제목이 있는 JSON 파일은 새 목록으로 추가됩니다. 기존 Word Quest 백업도 불러올 수 있어요. 같은 단어라도 단어장이 다르면 진도를 따로 저장합니다.</p><div class="row"><button class="btn" id="import">↑ 목록/백업 불러오기</button><button class="btn" id="export">↓ 전체 백업</button><input type="file" accept=".json,application/json" id="file" class="hidden"></div></details></div><div><div class="card"><h2>🎮 사냥 설정</h2><label>플레이 방식<select id="playStyle"><option value="arcade">액션 모드 · 도망가기 전에 잡기</option><option value="study">학습 모드 · 시간 제한 없음</option></select></label><label>출제 방향<select id="direction"><option value="en-ko">영어 → 뜻</option><option value="ko-en">뜻 → 영어</option><option value="mixed">랜덤으로 섞기</option></select></label><div class="fields"><label>한 번에 출제<select id="size"><option value="10">10개</option><option value="20">20개</option><option value="all">전체</option></select></label><label>파리 속도<select id="speed"><option value="calm">느긋하게</option><option value="normal" selected>보통</option><option value="fast">빠르게</option><option value="still">멈춰서 학습</option></select></label></div><label>학습할 단어</label><div class="choice" style="margin:10px 0 17px"><button class="btn active" data-scope="all">전체</button><button class="btn" data-scope="unlearned">미완료</button><button class="btn" data-scope="wrong">오답만</button></div><button class="primary" id="start" style="width:100%">🪰 선택한 목록으로 시작</button><button class="btn hidden" id="resume" style="width:100%;margin-top:13px">▶ 지난 사냥 이어하기</button><p class="muted">액션 모드에서는 시간이 다 되면 파리가 도망가요. 오답과 놓친 단어만 모아 다음 라운드에서 다시 도전합니다.</p></div><div class="card"><h2>파리채 컬렉션</h2><div id="gearList" class="row"></div><p class="muted">식탁 클리어 → 네온 쇼크 · 골목 클리어 → 골든 스매셔</p></div><div class="help">👆 휴대폰: 정답 파리를 톡!<br>⌨️ 컴퓨터: 클릭 또는 숫자 1~4<br>⏸ 이동이 어렵다면 게임 중 ‘파리 멈추기’<br>🔊 소리는 버튼으로 언제든 끌 수 있어요.</div></div></div>
 <div id="editor" class="card hidden"><h2>📝 단어장 만들기 / 단어 추가</h2><label>단어장 이름<input id="title" placeholder="예: 10월 2일 뉴스 / 여행 영어"></label><p class="muted">한 줄에 ‘영어 | 뜻’을 입력하세요. 기존 목록에 추가할 때 같은 영어는 건너뛰어요.</p><textarea id="bulk" placeholder="contingency | 만일의 사태&#10;mitigation | 완화, 경감" aria-label="단어 목록"></textarea><div class="row" style="margin-top:13px"><button class="primary" id="saveDeck">단어장 저장</button><button class="btn" id="cancelEditor">취소</button></div><div class="notice" id="editNotice" role="status"></div></div><footer class="footer">추가한 목록과 진도는 현재 기기의 브라우저에 저장됩니다. 다른 기기에서는 전체 백업을 불러오세요. 휴대폰에서는 웹주소로 접속해 사용하세요.</footer></section>
@@ -47,6 +47,59 @@ function mountCastSprite(host,index){
  host.replaceChildren(img);return img;
 }
 'use strict';
+const ESSENTIAL_TITLE="초5~중1 필수 영어 단어 50";
+const ESSENTIAL_WORDS=[
+ {en:'able',ko:'~할 수 있는'},
+ {en:'across',ko:'가로질러, 건너서'},
+ {en:'address',ko:'주소 / 연설하다'},
+ {en:'afraid',ko:'두려워하는'},
+ {en:'agree',ko:'동의하다'},
+ {en:'almost',ko:'거의'},
+ {en:'answer',ko:'대답 / 대답하다'},
+ {en:'arrive',ko:'도착하다'},
+ {en:'because',ko:'왜냐하면'},
+ {en:'believe',ko:'믿다'},
+ {en:'borrow',ko:'빌리다'},
+ {en:'break',ko:'깨뜨리다 / 쉬는 시간'},
+ {en:'bright',ko:'밝은, 똑똑한'},
+ {en:'bring',ko:'가져오다'},
+ {en:'build',ko:'짓다, 만들다'},
+ {en:'careful',ko:'조심하는, 신중한'},
+ {en:'carry',ko:'나르다, 가지고 다니다'},
+ {en:'catch',ko:'잡다'},
+ {en:'change',ko:'바꾸다 / 변화'},
+ {en:'choose',ko:'선택하다'},
+ {en:'collect',ko:'모으다'},
+ {en:'decide',ko:'결정하다'},
+ {en:'different',ko:'다른'},
+ {en:'during',ko:'~동안'},
+ {en:'early',ko:'이른, 일찍'},
+ {en:'enough',ko:'충분한, 충분히'},
+ {en:'every',ko:'모든, 매~'},
+ {en:'example',ko:'예, 본보기'},
+ {en:'excited',ko:'신이 난, 들뜬'},
+ {en:'famous',ko:'유명한'},
+ {en:'favorite',ko:'가장 좋아하는'},
+ {en:'finish',ko:'끝내다'},
+ {en:'follow',ko:'따라가다, 따르다'},
+ {en:'forget',ko:'잊다'},
+ {en:'future',ko:'미래'},
+ {en:'happen',ko:'일어나다'},
+ {en:'healthy',ko:'건강한'},
+ {en:'important',ko:'중요한'},
+ {en:'invite',ko:'초대하다'},
+ {en:'learn',ko:'배우다'},
+ {en:'leave',ko:'떠나다, 남기다'},
+ {en:'meaning',ko:'뜻, 의미'},
+ {en:'minute',ko:'분 / 잠깐'},
+ {en:'often',ko:'자주'},
+ {en:'practice',ko:'연습하다 / 연습'},
+ {en:'question',ko:'질문, 문제'},
+ {en:'remember',ko:'기억하다'},
+ {en:'return',ko:'돌아오다, 돌려주다'},
+ {en:'together',ko:'함께'},
+ {en:'usually',ko:'보통, 대개'},
+];
 const SEED=[
   {en:"equity", ko:"공정성, 형평성 / 지분"},
   {en:"aisle", ko:"통로"},
@@ -110,8 +163,11 @@ function goodDeck(d){return d&&typeof d.id==='string'&&typeof d.title==='string'
 function repair(d){const progress=d.progress&&typeof d.progress==='object'&&!Array.isArray(d.progress)?d.progress:{};return {...d,words:uniqueWords(d.words),progress:Object.assign(Object.create(null),progress),archived:!!d.archived}}
 let raw=read(STORE,null);let state=raw&&Array.isArray(raw.decks)?{...raw,decks:raw.decks.filter(goodDeck).map(repair)}:null;
 if(!state){const old=read('wq_game_v5',{});const ws=Array.isArray(old.words)&&old.words.every(valid)?old.words:SEED;const groups=new Map();for(const w of ws){const t=typeof w.deck==='string'?w.deck:'기존 뉴스 단어';if(!groups.has(t))groups.set(t,[]);groups.get(t).push(w)}state={version:1,decks:[...groups].map(([t,w])=>deck(t,w)),xp:Number(old.xp)||0,coins:0,best:Number(old.best)||0,sound:true,session:null};}
+const essentialDeckAdded=!state.essential50Added&&!state.decks.some(d=>d.title===ESSENTIAL_TITLE);
+if(essentialDeckAdded)state.decks.push(deck(ESSENTIAL_TITLE,ESSENTIAL_WORDS));
+state.essential50Added=true;
 state.xp=Math.max(0,Number(state.xp)||0);state.coins=Math.max(0,Number(state.coins)||0);state.best=Math.max(0,Number(state.best)||0);
-let selected=state.decks.find(d=>!d.archived)?.id||null,archivedView=false,scope='all',editing=null,session=null,active=false,paused=false,frozen=false,locked=false,flies=[],phase=0,lastTime=0,timer=null,audio=null,current=null,raf=null;
+let selected=(essentialDeckAdded?state.decks.at(-1):state.decks.find(d=>!d.archived))?.id||null,archivedView=false,scope='all',editing=null,session=null,active=false,paused=false,frozen=false,locked=false,flies=[],phase=0,lastTime=0,timer=null,audio=null,current=null,raf=null;
 function persist(){try{localStorage.setItem(STORE,JSON.stringify(state));return true}catch(e){$('notice').textContent='이 브라우저에 저장할 수 없어요. 전체 백업으로 기록을 보관하세요.';return false}}
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
